@@ -104,6 +104,10 @@ android {
 }
 
 dependencies {
+    def work_version = "2.8.0"
+    
+    implementation "androidx.work:work-runtime:$work_version"
+
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
@@ -118,6 +122,8 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

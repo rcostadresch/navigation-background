@@ -5,62 +5,70 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import Geolocation from '@react-native-community/geolocation'
+import { Button, NativeModules } from 'react-native'
+
+import React, { useCallback, useEffect } from 'react'
 import {
+  PermissionsAndroid,
+  Platform,
   SafeAreaView,
-  ScrollView,
   StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
   View,
-} from 'react-native';
+  useColorScheme,
+} from 'react-native'
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+import { Colors } from 'react-native/Libraries/NewAppScreen'
 
 function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const isDarkMode = useColorScheme() === 'dark'
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  }
+
+  const watchDevicePosition = () => {
+    Geolocation.watchPosition(
+      position => {
+        console.log(Date.now(), position)
+      },
+      error => console.error(error.message),
+      {
+        enableHighAccuracy: true,
+        timeout: 1500,
+        maximumAge: 0,
+        distanceFilter: 5,
+      },
+    )
+  }
+
+  const requestAndroidLocationPermission = useCallback(async () => {
+    const grantedFineLocation = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    )
+
+    const grantedBackgroundLocation = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+    )
+
+    if (
+      grantedFineLocation === PermissionsAndroid.RESULTS.GRANTED &&
+      grantedBackgroundLocation === PermissionsAndroid.RESULTS.GRANTED
+    ) {
+      NativeModules.BackgroundWorkManager.startBackgroundWork()
+    } else {
+      console.error('Request for location permission was denied by user')
+    }
+  }, [])
+
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      Geolocation.requestAuthorization()
+      watchDevicePosition()
+    } else {
+      requestAndroidLocationPermission()
+    }
+  }, [requestAndroidLocationPermission])
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -68,51 +76,34 @@ function App(): JSX.Element {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+
+      <View
+        style={{
+          height: '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <Button
+          onPress={() => {
+            NativeModules.BackgroundWorkManager.startBackgroundWork()
+          }}
+          title="Start background service"
+          color="green"
+        />
+
+        <View style={{ marginTop: 10 }}>
+          <Button
+            onPress={() => {
+              NativeModules.BackgroundWorkManager.stopBackgroundWork()
+              Geolocation.stopObserving()
+            }}
+            title="Stop background service"
+            color="red"
+          />
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-export default App;
+export default App
