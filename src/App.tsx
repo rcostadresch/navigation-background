@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
+
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
@@ -5,10 +7,10 @@
  * @format
  */
 
-import Geolocation from '@react-native-community/geolocation'
-import { Button, NativeModules } from 'react-native'
+import Geolocation from '@react-native-community/geolocation';
+import { Button, NativeModules } from 'react-native';
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react';
 import {
   PermissionsAndroid,
   Platform,
@@ -16,21 +18,21 @@ import {
   StatusBar,
   View,
   useColorScheme,
-} from 'react-native'
+} from 'react-native';
 
-import { Colors } from 'react-native/Libraries/NewAppScreen'
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark'
+  const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  }
+  };
 
   const watchDevicePosition = () => {
     Geolocation.watchPosition(
       position => {
-        console.log(Date.now(), position)
+        console.log(Date.now(), position);
       },
       error => console.error(error.message),
       {
@@ -39,36 +41,36 @@ function App(): JSX.Element {
         maximumAge: 0,
         distanceFilter: 5,
       },
-    )
-  }
+    );
+  };
 
   const requestAndroidLocationPermission = useCallback(async () => {
     const grantedFineLocation = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    )
+    );
 
     const grantedBackgroundLocation = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-    )
+    );
 
     if (
       grantedFineLocation === PermissionsAndroid.RESULTS.GRANTED &&
       grantedBackgroundLocation === PermissionsAndroid.RESULTS.GRANTED
     ) {
-      NativeModules.BackgroundWorkManager.startBackgroundWork()
+      NativeModules.BackgroundWorkManager.startBackgroundWork();
     } else {
-      console.error('Request for location permission was denied by user')
+      console.error('Request for location permission was denied by user');
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
-      Geolocation.requestAuthorization()
-      watchDevicePosition()
+      Geolocation.requestAuthorization();
+      watchDevicePosition();
     } else {
-      requestAndroidLocationPermission()
+      requestAndroidLocationPermission();
     }
-  }, [requestAndroidLocationPermission])
+  }, [requestAndroidLocationPermission]);
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -85,7 +87,7 @@ function App(): JSX.Element {
         }}>
         <Button
           onPress={() => {
-            NativeModules.BackgroundWorkManager.startBackgroundWork()
+            NativeModules.BackgroundWorkManager.startBackgroundWork();
           }}
           title="Start background service"
           color="green"
@@ -94,8 +96,8 @@ function App(): JSX.Element {
         <View style={{ marginTop: 10 }}>
           <Button
             onPress={() => {
-              NativeModules.BackgroundWorkManager.stopBackgroundWork()
-              Geolocation.stopObserving()
+              NativeModules.BackgroundWorkManager.stopBackgroundWork();
+              Geolocation.stopObserving();
             }}
             title="Stop background service"
             color="red"
@@ -103,7 +105,7 @@ function App(): JSX.Element {
         </View>
       </View>
     </SafeAreaView>
-  )
+  );
 }
 
-export default App
+export default App;

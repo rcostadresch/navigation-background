@@ -6,7 +6,7 @@
     "isolatedModules": true,
     "jsx": "react-native",
     "skipLibCheck": true,
-    "lib": ["es6"],
+    "lib": ["es6", "ES2021.String"],
     "moduleResolution": "node",
     "module": "esnext",
     "forceConsistentCasingInFileNames": true,
@@ -16,10 +16,34 @@
     "strictNullChecks": true,
     "strictFunctionTypes": false,
     "target": "esnext",
-    "typeRoots": ["node_modules/@types", "./src/types"],
+    "types": ["jest"],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
     "baseUrl": ".",
     "paths": {
-      "*": ["./src/*"]
+      "*": ["./src/*"],
+      "_app/*": ["./src/app/*"],
+      "_core/*": ["./src/app/core/*"],
+      "_auth/*": ["./src/app/auth/*"],
+      "_wallet/*": ["./src/app/wallet/*"],
+      "_transactions/*": ["./src/app/transactions/*"],
+      "_assets/*": ["./src/assets/*"],
+      "_components/*": ["./src/components/*"],
+      "_atoms/*": ["./src/components/atoms/*"],
+      "_atoms": ["./src/components/atoms/index.ts"],
+      "_molecules/*": ["./src/components/molecules/*"],
+      "_molecules": ["./src/components/molecules/index.ts"],
+      "_organisms/*": ["./src/components/organisms/*"],
+      "_organisms": ["./src/components/organisms/index.ts"],
+      "_templates/*": ["./src/components/templates/*"],
+      "_templates": ["./src/components/templates/index.ts"],
+      "_constants": ["./src/constants/*", "./src/constants/index.ts"],
+      "_styles/*": ["./src/styles/*"],
+      "_themes": ["./src/styles/themes/*", "./src/styles/themes/index.ts"],
+      "_utils": ["./src/utils/index.ts"],
+      "_utils/*": ["./src/utils/*"],
+      "_languages": ["./src/i18n/index.ts"],
+      "_interfaces/*": ["./src/interfaces/*"],
+      "_types/*": ["./src/types/*"]
     }
   },
   "exclude": [
@@ -27,5 +51,6 @@
     "babel.config.js",
     "metro.config.js",
     "jest.config.js"
-  ]
+  ],
+  "extends": "@tsconfig/react-native/tsconfig.json"
 }
